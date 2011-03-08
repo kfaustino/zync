@@ -153,6 +153,7 @@ module Zync
             @scope[:scoped_path] ||= []
             @scope[:scoped_path] << scope
             yield
+            @scope[:scoped_path].pop
           end
 
       end

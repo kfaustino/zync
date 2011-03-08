@@ -38,13 +38,21 @@ describe "Zync Routing" do
         end
       end
 
-      scope '/:league_slug' do
+      scope '/first_sibling' do
         match '/news', :to => 'news#index'
 
         resources :teams
 
         scope'(/seasons/:season_id)' do
           resources :players
+        end
+      end
+      
+      scope '/second_sibling' do
+        match '/headlines', :to => 'headlines#index'
+        
+        scope '/child_of_second_sibling' do
+          match '/grandchild_of_second_sibling', :to => 'grandchild_of_second_sibling#show'
         end
       end
 
@@ -80,28 +88,47 @@ describe "Zync Routing" do
     context "within a scope" do
 
       it "prepends the scope to the path" do
-        response = request.get('/nulayer/news')
+        response = request.get('/first_sibling/news')
         response.body.should == "news#index"
       end
 
       it "prepends the scope to resources" do
-        response = request.get('/nulayer/teams/123')
+        response = request.get('/first_sibling/teams/123')
         response.body.should == "teams#show"
       end
 
       context "with a nested scope" do
 
         it "prepends the nested scope only to routes within the nested scope definition" do
-          response = request.get('/nulayer/players')
+          response = request.get('/first_sibling/players')
           response.body.should == "players#index"
 
-          response = request.get('/nulayer/seasons/123/players')
+          response = request.get('/first_sibling/seasons/123/players')
           response.body.should == "players#index"
 
-          response = request.get('/nulayer/seasons/123/players/456')
+          response = request.get('/first_sibling/seasons/123/players/456')
           response.body.should == "players#show"
         end
 
+      end
+      
+      context "within a sibling scope" do
+        
+        it "should support multiple scopes at the same level" do
+          response = request.get('/second_sibling/headlines')
+          response.body.should == "headlines#index"
+        end
+        
+        it "should not nest siblings within one another" do
+          response = request.get('/first_sibling/second_sibling/headlines')
+          response.body.should == "Not Found"
+        end
+        
+        it "should be able to nest scopes of sibling scopes" do
+          response = request.get('/second_sibling/child_of_second_sibling/grandchild_of_second_sibling')
+          response.body.should == "grandchild_of_second_sibling#show"
+        end
+        
       end
 
     end
