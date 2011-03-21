@@ -8,6 +8,7 @@ describe "Zync Routing" do
       match '/sports', :to => 'sports#index'
       get '/team_stats(/:grouping)', :to => 'team_stats#index'
       post '/fetch', :to => "api#fetch"
+      delete '/events/:id', :to => 'events#destroy'
 
       resources :players
 
@@ -78,6 +79,11 @@ describe "Zync Routing" do
 
       post_response = request.post('/fetch')
       post_response.body.should == "api#fetch"
+    end
+    
+    it "routes DELETE requests" do
+      delete_response = request.delete('/events/123')
+      delete_response.body.should == "events#destroy"
     end
 
     it "accepts optional parameters" do

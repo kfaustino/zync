@@ -117,9 +117,14 @@ module Zync
           match_method(:get, *args)
           self
         end
-
+        
         def post(*args)
           match_method(:post, *args)
+          self
+        end
+        
+        def delete(*args)
+          match_method(:delete, *args)
           self
         end
 
