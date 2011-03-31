@@ -123,6 +123,11 @@ module Zync
           self
         end
         
+        def put(*args)
+          match_method(:put, *args)
+          self
+        end
+        
         def delete(*args)
           match_method(:delete, *args)
           self
